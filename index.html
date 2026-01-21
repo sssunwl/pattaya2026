@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>泰嘆芭堤雅🇹🇭新年度假團</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="九五至尊">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2060/2060206.png">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Playfair+Display:wght@700&display=swap');
+        
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: #F5F2ED; 
+            color: #4A4A4A;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: env(safe-area-inset-bottom);
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* 左側懸浮導航 - 書籤風格 */
+        .bookmark-nav {
+            position: fixed;
+            left: 0;
+            top: 120px; /* 左上方位置 */
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .bookmark-item {
+            padding: 10px 16px 10px 12px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-top-right-radius: 16px;
+            border-bottom-right-radius: 16px;
+            box-shadow: 2px 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.4);
+            border-left: none;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateX(-4px); /* 預設稍微收進去 */
+            cursor: pointer;
+        }
+
+        .bookmark-item.active {
+            background: rgba(142, 154, 175, 0.95); /* Primary Color */
+            color: white;
+            transform: translateX(0) scale(1.05);
+            padding-right: 20px;
+            box-shadow: 4px 4px 15px rgba(142, 154, 175, 0.3);
+        }
+
+        /* 頁內吸附導航 (Day 1, Day 2...) */
+        .sticky-subnav {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: rgba(245, 242, 237, 0.98);
+            backdrop-filter: blur(12px);
+            box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .btn-press { transition: transform 0.1s; cursor: pointer; }
+        .btn-press:active { transform: scale(0.95); }
+        
+        /* Modal & Animations */
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            z-index: 60;
+            animation: fadeIn 0.2s ease-out;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+        
+        .modal-content {
+            background: #FFFFFF;
+            width: 100%;
+            min-height: 75vh;
+            max-height: 90vh;
+            border-top-left-radius: 2.5rem;
+            border-top-right-radius: 2.5rem;
+            overflow-y: auto;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
+            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 70;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bg: '#F5F2ED',
+                        primary: '#8E9AAF',
+                        accent: '#E09F7D',
+                        dark: '#4A4A4A',
+                        card: '#FFFFFF',
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(142, 154, 175, 0.15)',
+                        'float': '0 20px 40px -5px rgba(142, 154, 175, 0.2)'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- 資料庫 ---
+        const MEMBERS = [
+            { id: 'lam', name: "Lam", avatar: "🦁" },
+            { id: 'ricky', name: "Ricky", avatar: "🐻" },
+            { id: 'robin', name: "Robin", avatar: "🐯" },
+            { id: 'jolin', name: "Jolin", avatar: "🐰" },
+            { id: 'pat', name: "Pat", avatar: "🦊" },
+            { id: 'masa', name: "Masa", avatar: "🐨" },
+            { id: 'yi', name: "Yi", avatar: "🐼" },
+            { id: 'justin', name: "Justin", avatar: "🐵" },
+            { id: 'han', name: "Han", avatar: "👶" }
+        ];
+
+        const WEATHER_DATA = [
+            { date: "2/13", icon: "cloud-sun", temp: "31°", label: "Day 1" },
+            { date: "2/14", icon: "sun", temp: "32°", label: "Day 2" },
+            { date: "2/15", icon: "sun", temp: "29°", label: "Day 3" },
+            { date: "2/16", icon: "sun", temp: "30°", label: "Day 4" },
+            { date: "2/17", icon: "cloud-sun", temp: "31°", label: "Day 5" },
+            { date: "2/18", icon: "plane", temp: "28°", label: "Day 6" },
+        ];
+
+        const ITINERARY = [
+            {
+                day: "Day 1", date: "2/13 (五)", theme: "「泰」快閃", id: "d1", highlights: "落機即衝夜市",
+                details: [
+                    { id: "e1", time: "14:25", title: "抵達 BKK 機場", desc: "專車接送往芭堤雅", location: "Suvarnabhumi Airport", thai_text: "สนามบินสุวรรณภูมิ", icon: "plane", type: "transport", img: "https://images.unsplash.com/photo-1542296332-2e449c29d009?w=800" },
+                    { id: "e2", time: "16:30", title: "入住 Akara Hotel", desc: "Check-in 稍作休息", location: "Akara Hotel Pattaya", thai_text: "โรงแรมอัครา พัทยา", icon: "hotel", type: "hotel", img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800" },
+                    { id: "e3", time: "18:00", title: "飛機夜市掃街", desc: "Terminal 21 門口", location: "Runway Street Food Pattaya", thai_text: "ตลาดนัดเครื่องบิน พัทยา", icon: "shopping-bag", type: "activity", img: "https://images.unsplash.com/photo-1555243560-ef023c04294a?w=800" },
+                    { id: "e4", time: "19:30", title: "Ginger Farm Kitchen", desc: "米芝蓮泰北菜", location: "Ginger Farm Kitchen Pattaya", thai_text: "ร้านจินเจอร์ ฟาร์ม คิทเช่น", icon: "utensils", type: "food", img: "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800" },
+                    { id: "e5", time: "21:30", title: "Makkah Spa", desc: "舒緩飛行疲勞", location: "Makkah Health & Spa Pattaya", thai_text: "มัคคา เฮลท์ แอนด์ สปา", icon: "sparkles", type: "spa", img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800" }
+                ]
+            },
+            {
+                day: "Day 2", date: "2/14 (六)", theme: "「泰」科幻", id: "d2", highlights: "星際探險之旅",
+                details: [
+                    { id: "e6", time: "11:00", title: "往 Space Hotel", desc: "行李專車已預約", location: "Grande Centre Point Space Pattaya", thai_text: "โรงแรม แกรนด์ เซนเตอร์ พอยต์ สเปซ พัทยา", icon: "truck", type: "transport", img: "https://images.unsplash.com/photo-1571896349842-6e5c48dc52e3?w=800" },
+                    { id: "e7", time: "12:00", title: "Tora Tapas", desc: "午餐：松露干貝", location: "Tora Tapas Pattaya", thai_text: "โทรา ทาปาส พัทยา", icon: "utensils", type: "food", img: "https://images.unsplash.com/photo-1514326640560-7d063ef2aed5?w=800" },
+                    { id: "e8", time: "14:00", title: "Space 水上樂園", desc: "瘋狂玩水、漂流河", location: "Grande Centre Point Space Pattaya", thai_text: "สวนน้ำอวกาศ", icon: "waves", type: "activity", img: "https://images.unsplash.com/photo-1533316447883-492770977218?w=800" },
+                    { id: "e9", time: "19:00", title: "Orbit Restaurant", desc: "海鮮自助餐放題", location: "Grande Centre Point Space Pattaya", thai_text: "ห้องอาหารออร์บิท", icon: "utensils", type: "food", img: "https://images.unsplash.com/photo-1625937751876-453009747972?w=800" }
+                ]
+            },
+            {
+                day: "Day 3", date: "2/15 (日)", theme: "「泰」熱血", id: "d3", highlights: "佛系建築與越野飛車",
+                details: [
+                    { id: "e10", time: "10:30", title: "真理聖殿", desc: "木雕藝術", location: "Sanctuary of Truth", thai_text: "ปราสาทสัจธรรม", icon: "landmark", type: "activity", img: "https://images.unsplash.com/photo-1599553765870-07a828cb0085?w=800" },
+                    { id: "e11", time: "13:00", title: "ATV 越野飛車", desc: "叢林冒險", location: "Pattaya Offroad Safari", thai_text: "พัทยา ออฟโรด ซาฟารี", icon: "car", type: "activity", img: "https://images.unsplash.com/photo-1551816230-ef5deaed4a26?w=800" },
+                    { id: "e12", time: "18:30", title: "Bay Bay Seafood", desc: "海鮮 BBQ", location: "BayBay Buffet Talaypao", thai_text: "เบย์เบย์ บุฟเฟต์ทะเลเผา", icon: "utensils", type: "food", img: "https://images.unsplash.com/photo-1534008753122-a837cf46d288?w=800" },
+                    { id: "e13", time: "20:30", title: "中天夜市", desc: "海濱地道氣氛", location: "Jomtien Night Market", thai_text: "ตลาดนัดจอมเทียน", icon: "moon", type: "activity", img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800" }
+                ]
+            },
+            {
+                day: "Day 4", date: "2/16 (一)", theme: "「泰」招積", id: "d4", highlights: "私人包船海上派對",
+                details: [
+                    { id: "e14", time: "10:30", title: "行李直送 Villa", desc: "人貨分流", location: "Villa De Amore Pattaya", thai_text: "วิลล่า เดอ อะมอเร่ พัทยา", icon: "briefcase", type: "transport", img: "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?w=800" },
+                    { id: "e15", time: "11:30", title: "前往碼頭", desc: "專車接送", location: "Port of Samae Sarn", thai_text: "ท่าเรือแสมสาร", icon: "anchor", type: "transport", img: "https://images.unsplash.com/photo-1569263979104-565b63418962?w=800" },
+                    { id: "e16", time: "13:00", title: "Seanlyn 私人包船", desc: "滑梯、釣魚、BBQ", location: "Samae San Island", thai_text: "เหมาเรือส่วนตัว Seanlyn", icon: "ship", type: "activity", img: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=800" },
+                    { id: "e17", time: "17:30", title: "入住 Villa De Amore", desc: "私人泳池別墅", location: "Villa De Amore Pattaya", thai_text: "วิลล่า เดอ อะมอเร่", icon: "home", type: "hotel", img: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800" }
+                ]
+            },
+            {
+                day: "Day 5", date: "2/17 (二)", theme: "「泰」網紅", id: "d5", highlights: "打卡食神日落之旅",
+                details: [
+                    { id: "e18", time: "11:30", title: "Khun Sri 豬雜湯", desc: "招牌胡椒湯底", location: "Khun Sri Pork Blood Soup", thai_text: "ต้มเลือดหมูคุณศรี", icon: "coffee", type: "food", img: "https://images.unsplash.com/photo-1548943487-a2e4e43b485c?w=800" },
+                    { id: "e19", time: "13:00", title: "After Yum", desc: "全泰最紅生醃", location: "After Yum", thai_text: "ร้านอาฟเตอร์ยำ", icon: "utensils", type: "food", img: "https://images.unsplash.com/photo-1626804475297-411d0c624f9c?w=800" },
+                    { id: "e20", time: "15:00", title: "四方水上市場", desc: "體驗手划船", location: "Pattaya Floating Market", thai_text: "ตลาดน้ำ 4 ภาค พัทยา", icon: "map", type: "activity", img: "https://images.unsplash.com/photo-1598970434795-0c54fe7c0648?w=800" },
+                    { id: "e21", time: "16:30", title: "House of Benedict", desc: "室內場景攝影", location: "House of Benedict Pattaya", thai_text: "เฮาส์ ออฟ เบเนดิกต์", icon: "camera", type: "activity", img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800" },
+                    { id: "e22", time: "18:00", title: "Glass House Boho", desc: "日落海鮮餐", location: "The Glass House Boho", thai_text: "เดอะ กลาสเฮ้าส์ โบโฮ", icon: "sunset", type: "food", img: "https://images.unsplash.com/photo-1537047902294-6228b02e6993?w=800" },
+                    { id: "e23", time: "21:00", title: "Oasis Spa", desc: "高級別墅按摩", location: "Oasis Spa Pattaya Jomtien", thai_text: "โอเอซิส สปา พัทยา", icon: "sparkles", type: "spa", img: "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?w=800" }
+                ]
+            },
+            {
+                day: "Day 6", date: "2/18 (三)", theme: "「泰」唔捨得", id: "d6", highlights: "海鮮衝刺返港",
+                details: [
+                    { id: "e24", time: "11:00", title: "Villa 退房", desc: "整理行李", location: "Villa De Amore Pattaya", thai_text: "วิลล่า เดอ อะมอเร่", icon: "log-out", type: "hotel", img: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800" },
+                    { id: "e25", time: "11:30", title: "Lek Seafood", desc: "最後海鮮衝刺", location: "Lek Seafood", thai_text: "ร้านอาหารเล็กอาหารทะเล", icon: "utensils", type: "food", img: "https://images.unsplash.com/photo-1599488615731-7e512819a636?w=800" },
+                    { id: "e26", time: "13:15", title: "前往機場", desc: "人貨分流往 BKK", location: "Suvarnabhumi Airport", thai_text: "สนามบินสุวรรณภูมิ", icon: "plane", type: "transport", img: "https://images.unsplash.com/photo-1530521954074-e64f6810b32d?w=800" }
+                ]
+            }
+        ];
+
+        const GUIDE_ITEMS = [
+            { id: 1, type: "activity", category: "玩樂", name: "Seanlyn 包船", tag: "豪華長尾船", desc: "13:00 - 17:00 | 專屬雙層木船，配備海上滑梯、透明獨木舟、SUP，還能在船上 BBQ 釣魚！", cover: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=600&q=80", video: "M7lc1UVf-VE" }, 
+            { id: 2, type: "activity", category: "玩樂", name: "ATV 越野車", tag: "熱血冒險", desc: "13:30 - 15:30 | 穿越叢林泥地，挑戰腎上腺素！玩完後享用漢堡薯條。", cover: "https://images.unsplash.com/photo-1551816230-ef5deaed4a26?w=600&q=80", video: "" },
+            { id: 3, type: "hotel", category: "住宿", name: "Space Pattaya", tag: "科幻未來", desc: "全泰首座太空主題酒店，31,000呎水上樂園，房間有極光投影。", cover: "https://images.unsplash.com/photo-1571896349842-6e5c48dc52e3?w=600&q=80", video: "" },
+            { id: 4, type: "food", category: "美食", name: "After Yum", tag: "生醃傳奇", desc: "全泰最紅生醃名店，必點生醃三文魚與炸豬頸肉，酸辣開胃。", cover: "https://images.unsplash.com/photo-1626804475297-411d0c624f9c?w=600&q=80", video: "" },
+            { id: 5, type: "food", category: "美食", name: "Glass House Boho", tag: "日落晚餐", desc: "波希米亞風情，坐在沙灘沙發上看夕陽吃松露薄餅。", cover: "https://images.unsplash.com/photo-1537047902294-6228b02e6993?w=600&q=80", video: "" },
+            { id: 6, type: "hotel", category: "住宿", name: "Villa De Amore", tag: "私人隱世", desc: "9人家庭專屬包場，私人泳池與大客廳。", cover: "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d?w=600&q=80", video: "" },
+            { id: 7, type: "hotel", category: "住宿", name: "Akara Hotel", tag: "都會輕奢", desc: "頂樓無邊際泳池，飽覽芭堤雅夜景。", cover: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=600&q=80", video: "" },
+        ];
+
+        // --- 共通組件 ---
+        const Icon = ({ name, size = 20, className }) => {
+            useEffect(() => { lucide.createIcons(); }, [name]);
+            return <i data-lucide={name} style={{ width: size, height: size }} className={className}></i>;
+        };
+
+        const HeroHeader = ({ user, title = "泰嘆芭堤雅", subtitle = "九五至尊度假團" }) => (
+            <div className="relative h-[260px] w-full overflow-hidden shadow-soft bg-white z-0">
+                <img src="https://images.unsplash.com/photo-1595661665673-9a3d4d385226?w=800&q=80" className="w-full h-full object-cover opacity-90" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex flex-col justify-end p-6 pb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                        <span className="bg-white/20 backdrop-blur px-2 py-1 rounded-lg text-[10px] font-bold text-white border border-white/30">9人行</span>
+                        <span className="bg-accent px-2 py-1 rounded-lg text-[10px] font-bold text-white shadow-sm">農曆新年</span>
+                    </div>
+                    <h1 className="font-serif text-3xl text-white font-bold tracking-wide leading-tight shadow-sm">{title}</h1>
+                    <div className="text-white/80 text-xs font-bold mt-1 tracking-wider">{subtitle}</div>
+                </div>
+                <div className="absolute top-4 right-4 bg-white/90 backdrop-blur pl-1 pr-3 py-1 rounded-full text-xs shadow-lg flex items-center gap-2 border border-white/50 z-50">
+                    <span className="text-lg bg-gray-100 rounded-full w-6 h-6 flex items-center justify-center">{user.avatar}</span> 
+                    <span className="font-bold text-primary">{user.name.split(' ')[0]}</span>
+                </div>
+            </div>
+        );
+
+        // --- 左側書籤主導航 ---
+        const BookmarkNav = ({ activeTab, setActiveTab }) => {
+            const tabs = [
+                { id: 'timeline', label: '行程', icon: 'calendar' },
+                { id: 'guide', label: '資訊', icon: 'compass' },
+                { id: 'wallet', label: '記帳', icon: 'wallet' },
+                { id: 'tools', label: '工具', icon: 'wrench' },
+                { id: 'memory', label: '相簿', icon: 'image' },
+            ];
+
+            return (
+                <div className="bookmark-nav">
+                    {tabs.map((tab) => (
+                        <div 
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={`bookmark-item ${activeTab === tab.id ? 'active' : ''}`}
+                        >
+                            <div className="flex flex-col items-center gap-1">
+                                <Icon name={tab.icon} size={20} className={activeTab === tab.id ? "text-white" : "text-gray-500"} />
+                                <span className={`text-[10px] font-bold writing-vertical ${activeTab === tab.id ? "text-white" : "text-gray-500"}`}>{tab.label}</span>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            );
+        };
+
+        // --- 頁內吸附子導航 (Sub Nav) ---
+        const StickySubNav = ({ items, activeId, onSelect }) => (
+            <div className="sticky-subnav flex items-center h-14 px-4 mb-2 overflow-hidden shadow-sm border-b border-gray-100">
+                <div className="flex overflow-x-auto no-scrollbar items-center gap-2 w-full">
+                    {items.map((item) => (
+                        <button key={item.id} onClick={() => onSelect(item.id)} 
+                            className={`whitespace-nowrap px-4 py-1.5 rounded-full text-xs font-bold transition-all ${activeId === item.id ? 'bg-primary text-white shadow-md' : 'bg-white text-gray-400 border border-gray-100'}`}>
+                            {item.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+        );
+
+        // --- 歡迎登入頁 ---
+        const WelcomeView = ({ onLogin }) => (
+            <div className="min-h-screen bg-bg flex flex-col items-center justify-center p-8 animate-fade-in relative overflow-hidden">
+                <div className="absolute top-[-10%] left-[-10%] w-64 h-64 bg-primary/10 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-[-10%] right-[-10%] w-64 h-64 bg-accent/10 rounded-full blur-3xl"></div>
+                <div className="mb-10 text-center relative z-10">
+                    <div className="w-24 h-24 bg-white rounded-full mx-auto mb-6 flex items-center justify-center shadow-float text-5xl border-4 border-white/50">🇹🇭</div>
+                    <h1 className="text-3xl font-bold text-dark font-serif tracking-wide mb-2">泰嘆芭堤雅</h1>
+                    <div className="text-xs text-accent font-bold tracking-[0.2em] uppercase">Luxury Retreat 2026</div>
+                </div>
+                <div className="w-full max-w-sm bg-white/60 backdrop-blur-md rounded-[2rem] p-6 shadow-soft border border-white/50">
+                    <p className="text-center text-gray-500 mb-6 font-medium text-sm">請選擇你的身份登入</p>
+                    <div className="grid grid-cols-3 gap-4">
+                        {MEMBERS.map(m => (
+                            <button key={m.id} onClick={() => onLogin(m)} className="flex flex-col items-center p-3 bg-white rounded-2xl shadow-sm hover:shadow-md transition-all btn-press border border-white/50">
+                                <span className="text-3xl mb-1">{m.avatar}</span>
+                                <span className="text-[10px] font-bold text-dark">{m.name.split(' ')[0]}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+            </div>
+        );
+
+        // --- 詳細行程卡 ---
+        const EventDetailSheet = ({ event, onClose }) => {
+            if (!event) return null;
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="relative h-64 w-full bg-gray-200">
+                            <img src={event.img} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                            <button onClick={onClose} className="absolute top-4 right-4 bg-black/30 backdrop-blur text-white p-2 rounded-full z-10"><Icon name="x" size={24}/></button>
+                            <div className="absolute bottom-0 left-0 w-full p-6 pt-20">
+                                <h1 className="text-3xl font-serif font-bold text-white drop-shadow-md">{event.title}</h1>
+                                <div className="flex gap-2 mt-2">
+                                    <span className="bg-primary/90 text-white text-[10px] px-2 py-1 rounded-md font-bold uppercase backdrop-blur-sm">{event.type}</span>
+                                    <span className="bg-white/20 text-white text-[10px] px-2 py-1 rounded-md font-bold flex items-center gap-1 backdrop-blur-sm"><Icon name="clock" size={10}/> {event.time}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="p-6 space-y-6">
+                            {event.thai_text && (
+                                <div className="bg-white/50 rounded-3xl p-6 text-center border border-white shadow-sm relative overflow-hidden group active:scale-[0.98] transition-transform">
+                                    <div className="absolute top-0 right-0 bg-primary text-white text-[10px] px-3 py-1 rounded-bl-xl font-bold">SHOW DRIVER</div>
+                                    <p className="text-xs text-gray-400 font-bold uppercase tracking-wider mb-2">Show to Staff</p>
+                                    <h3 className="text-3xl font-bold text-dark font-serif leading-tight my-2">{event.thai_text}</h3>
+                                    <p className="text-sm text-gray-500 mt-2">{event.location}</p>
+                                </div>
+                            )}
+                            <div>
+                                <h4 className="font-bold text-dark mb-2">關於此行程</h4>
+                                <p className="text-sm text-gray-600 leading-relaxed bg-white/50 p-4 rounded-2xl border border-white">{event.desc}</p>
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-dark mb-2">位置導航</h4>
+                                <div className="h-40 bg-gray-100 rounded-2xl relative overflow-hidden cursor-pointer group border border-gray-200" onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`, '_blank')}>
+                                    <div className="absolute inset-0 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ec/Mapbox_iOS_SDK_2.jpg')] bg-cover bg-center opacity-50 grayscale group-hover:grayscale-0 transition-all"></div>
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <button className="bg-white px-4 py-2 rounded-full shadow-lg flex items-center gap-2 text-sm font-bold text-dark hover:scale-105 transition-transform">
+                                            <Icon name="map-pin" size={16} className="text-red-500" /> Open in Google Maps
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const GuideDetailSheet = ({ item, onClose }) => {
+            if (!item) return null;
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <div className="relative h-64 w-full bg-gray-200">
+                            <img src={item.cover} className="w-full h-full object-cover" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
+                            <button onClick={onClose} className="absolute top-4 right-4 bg-black/30 backdrop-blur text-white p-2 rounded-full z-10"><Icon name="x" size={24}/></button>
+                            <div className="absolute bottom-0 left-0 w-full p-6 pt-20">
+                                <span className="bg-accent text-white text-[10px] px-2 py-1 rounded-md font-bold uppercase mb-2 inline-block shadow-sm">{item.tag}</span>
+                                <h1 className="text-3xl font-serif font-bold text-white drop-shadow-md">{item.name}</h1>
+                            </div>
+                        </div>
+                        <div className="p-6 space-y-6">
+                            {item.video && (
+                                <div className="video-container bg-black rounded-2xl overflow-hidden shadow-lg">
+                                    <iframe src={`https://www.youtube.com/embed/${item.video}`} frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen></iframe>
+                                </div>
+                            )}
+                            {item.food_img && (
+                                <div className="bg-white/60 p-4 rounded-2xl border border-white">
+                                    <h4 className="font-bold text-dark text-sm mb-3 flex items-center gap-2"><Icon name="utensils" size={16} className="text-accent" /> 必點美食</h4>
+                                    <div className="flex gap-4 items-center">
+                                        <img src={item.food_img} className="w-20 h-20 rounded-xl object-cover shadow-sm flex-shrink-0" />
+                                        <p className="text-sm text-gray-600 font-medium">{item.highlight}</p>
+                                    </div>
+                                </div>
+                            )}
+                            <div>
+                                <h4 className="font-bold text-dark mb-2">詳細介紹</h4>
+                                <p className="text-sm text-gray-600 leading-relaxed text-justify bg-white/40 p-4 rounded-2xl">{item.desc}</p>
+                            </div>
+                            <button className="w-full bg-primary text-white py-4 rounded-2xl font-bold text-lg flex items-center justify-center gap-2 btn-press shadow-lg shadow-primary/30" onClick={() => window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.name)}`, '_blank')}>
+                                <Icon name="map" size={20} /> 開啟 Google Maps
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 頁面 1: 行程 ---
+        const TimelineView = ({ user }) => {
+            const [selectedEvent, setSelectedEvent] = useState(null);
+            const [activeDay, setActiveDay] = useState('d1');
+
+            const scrollTo = (id) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const offset = 320; 
+                    const y = el.getBoundingClientRect().top + window.scrollY - offset;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                    setActiveDay(id);
+                }
+            };
+            const subNavItems = ITINERARY.map((day, i) => ({ id: day.id, label: `Day ${i+1}` }));
+
+            return (
+                <div className="min-h-screen bg-bg relative animate-fade-in">
+                    <HeroHeader user={user} />
+                    <StickySubNav items={subNavItems} activeId={activeDay} onSelect={scrollTo} />
+                    
+                    {/* 天氣 Bar */}
+                    <div className="mb-8 overflow-x-auto no-scrollbar px-6 mt-4">
+                        <div className="flex gap-4 w-max">
+                            {WEATHER_DATA.map((w, i) => (
+                                <div key={i} className={`flex flex-col items-center min-w-[50px] p-2 rounded-xl border bg-white border-white shadow-sm`}>
+                                    <span className="text-[10px] text-gray-400 font-bold mb-1">{w.date}</span>
+                                    <Icon name={w.icon} size={20} className="text-primary" />
+                                    <span className="text-xs font-bold text-dark mt-1">{w.temp}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="px-4 pb-32 space-y-12">
+                        {ITINERARY.map((day, index) => (
+                            <div key={index} id={day.id} className="scroll-mt-40">
+                                <div className="flex items-center gap-3 mb-4 px-2">
+                                    <div className="w-2 h-8 bg-accent rounded-full"></div>
+                                    <div><h2 className="text-xl font-bold text-dark font-serif">{day.theme}</h2><p className="text-xs text-gray-400 font-bold tracking-wider">{day.date} • {day.highlights}</p></div>
+                                </div>
+                                <div className="space-y-4">
+                                    {day.details.map((item, i) => (
+                                        <div key={i} onClick={() => setSelectedEvent(item)} className="bg-white p-4 rounded-3xl shadow-soft border border-white relative overflow-hidden cursor-pointer flex gap-4 items-center group active:scale-98 transition-transform">
+                                            <div className="flex flex-col items-center min-w-[50px]"><span className="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-lg">{item.time}</span></div>
+                                            <div className="flex-1 border-l-2 border-gray-100 pl-4 py-1"><div className="font-bold text-dark text-base mb-1">{item.title}</div><div className="text-xs text-gray-400 line-clamp-1">{item.desc}</div></div>
+                                            <div className="w-8 h-8 rounded-full bg-bg flex items-center justify-center text-gray-300"><Icon name="chevron-right" size={16} /></div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                    {selectedEvent && <EventDetailSheet event={selectedEvent} onClose={() => setSelectedEvent(null)} />}
+                </div>
+            );
+        };
+
+        // --- 頁面 2: 資訊 ---
+        const GuideView = ({ user }) => {
+            const [selectedItem, setSelectedItem] = useState(null);
+            const [filter, setFilter] = useState("住宿");
+            const subNavItems = [{ id: '住宿', label: '住宿' }, { id: '美食', label: '美食' }, { id: '玩樂', label: '玩樂' }];
+            const filteredItems = GUIDE_ITEMS.filter(i => i.category === filter);
+
+            return (
+                <div className="min-h-screen bg-bg animate-fade-in">
+                    <HeroHeader user={user} title="攻略與靈感" subtitle="必吃必玩懶人包" />
+                    <StickySubNav items={subNavItems} activeId={filter} onSelect={setFilter} />
+                    <div className="p-4 pb-32">
+                        <div className="masonry-grid" style={{ columnCount: 1, columnGap: '12px' }}>
+                            {filteredItems.map((item) => (
+                                <div key={item.id} className="bg-white rounded-2xl overflow-hidden shadow-soft mb-4 btn-press cursor-pointer relative group" style={{ breakInside: 'avoid' }} onClick={() => setSelectedItem(item)}>
+                                    <div className="relative"><img src={item.cover} className="w-full h-auto object-cover" />{item.video && <div className="absolute inset-0 flex items-center justify-center bg-black/20"><div className="bg-white/30 backdrop-blur p-2 rounded-full text-white"><Icon name="play" size={20} fill="currentColor"/></div></div>}</div>
+                                    <div className="p-4"><span className="text-[10px] bg-bg px-2 py-1 rounded-md text-gray-500 font-bold tracking-wide uppercase mb-1 inline-block">{item.tag}</span><h3 className="font-bold text-base text-dark leading-tight">{item.name}</h3></div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    {selectedItem && <GuideDetailSheet item={selectedItem} onClose={() => setSelectedItem(null)} />}
+                </div>
+            );
+        };
+
+        // --- 頁面 3: 記帳 ---
+        const WalletView = ({ user }) => {
+            const [activeSection, setActiveSection] = useState('add');
+            const subNavItems = [{id:'add', label:'記帳'}, {id:'history', label:'紀錄'}];
+            // 記帳邏輯與資料
+            const [expenses, setExpenses] = useState([{ id: 1, item: "行李直送車費", cost: 400, currency: "HKD", payer: "lam", splitters: MEMBERS.map(m => m.id), type: "public", category: "交通" }]);
+            const [item, setItem] = useState("");
+            const [cost, setCost] = useState("");
+            const [currency, setCurrency] = useState("THB");
+            const [payer, setPayer] = useState(user.id);
+            const [splitters, setSplitters] = useState(MEMBERS.map(m => m.id));
+            const toggleSplitter = (id) => { if (splitters.includes(id)) setSplitters(splitters.filter(s => s !== id)); else setSplitters([...splitters, id]); };
+            const addExpense = () => { if (!item || !cost) return; const newExp = { id: Date.now(), item, cost: parseFloat(cost), currency, payer, splitters, type: "public", category: "雜項" }; setExpenses([newExp, ...expenses]); setItem(""); setCost(""); };
+            const publicTotalHKD = expenses.reduce((acc, c) => acc + (c.currency === 'HKD' ? c.cost : c.cost / 4.3), 0);
+
+            return (
+                <div className="min-h-screen bg-bg animate-fade-in">
+                    <HeroHeader user={user} title="公數記帳" subtitle="清楚分帳不傷感情" />
+                    <StickySubNav items={subNavItems} activeId={activeSection} onSelect={setActiveSection} />
+                    <div className="p-4 pb-32">
+                        {activeSection === 'add' && (
+                            <div className="space-y-6">
+                                <div className="bg-white p-6 rounded-3xl flex justify-between items-center relative overflow-hidden shadow-soft">
+                                    <div><div className="text-xs text-gray-500 mb-1 font-bold">公帳總額 (HKD)</div><div className="text-3xl font-serif font-bold text-dark">${publicTotalHKD.toFixed(0)}</div></div>
+                                    <div className="text-right z-10"><div className="text-xs text-gray-500 mb-1 font-bold">每人 (÷8)</div><div className="text-xl font-bold text-accent">${(publicTotalHKD / 8).toFixed(0)}</div></div>
+                                </div>
+                                <div className="bg-white p-5 rounded-3xl shadow-soft space-y-4 border border-white">
+                                    <input placeholder="消費項目" value={item} onChange={e => setItem(e.target.value)} className="w-full bg-bg p-3 rounded-xl text-sm outline-none" />
+                                    <div className="flex gap-2"><input type="number" placeholder="金額" value={cost} onChange={e => setCost(e.target.value)} className="flex-1 bg-bg p-3 rounded-xl text-sm outline-none" /><select value={currency} onChange={e => setCurrency(e.target.value)} className="bg-bg p-3 rounded-xl text-sm outline-none font-bold text-primary"><option value="THB">THB</option><option value="HKD">HKD</option></select></div>
+                                    <div><label className="text-xs text-gray-400 font-bold mb-2 block">誰付錢 (單選)</label><div className="grid grid-cols-5 gap-2">{MEMBERS.map(m => (<button key={m.id} onClick={() => setPayer(m.id)} className={`p-1 rounded-xl flex flex-col items-center transition-all ${payer === m.id ? 'bg-primary text-white scale-105 shadow-md' : 'bg-bg text-gray-400'}`}><span className="text-lg">{m.avatar}</span><span className="text-[9px] font-bold">{m.name.split(' ')[0]}</span></button>))}</div></div>
+                                    <div><div className="flex justify-between items-center mb-2"><label className="text-xs text-gray-400 font-bold">誰分攤 (多選)</label><button onClick={() => setSplitters(splitters.length === MEMBERS.length ? [] : MEMBERS.map(m => m.id))} className="text-[10px] text-accent font-bold bg-accent/10 px-2 py-0.5 rounded">全選/清空</button></div><div className="grid grid-cols-5 gap-2">{MEMBERS.map(m => (<button key={m.id} onClick={() => toggleSplitter(m.id)} className={`p-1 rounded-xl flex flex-col items-center transition-all ${splitters.includes(m.id) ? 'bg-accent text-white shadow-sm' : 'bg-bg text-gray-400 opacity-50'}`}><span className="text-lg">{m.avatar}</span><span className="text-[9px] font-bold">{m.name.split(' ')[0]}</span></button>))}</div></div>
+                                    <button onClick={addExpense} className="w-full bg-dark text-white py-3 rounded-xl font-bold btn-press shadow-lg flex items-center justify-center gap-2"><Icon name="plus-circle" size={18} /> 加入公帳</button>
+                                </div>
+                            </div>
+                        )}
+                        {activeSection === 'history' && (
+                            <div className="space-y-3">{expenses.map(ex => (<div key={ex.id} className="bg-white p-3 rounded-2xl border border-gray-50 shadow-sm flex justify-between items-center"><div className="flex items-center gap-3"><div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-lg">{MEMBERS.find(m => m.id === ex.payer)?.avatar}</div><div><div className="text-sm font-bold text-dark">{ex.item}</div><div className="text-[10px] text-gray-400">{MEMBERS.find(m => m.id === ex.payer)?.name.split(' ')[0]} 付 • {ex.splitters.length} 人分</div></div></div><div className="text-right"><div className="font-bold text-dark">{ex.currency} {ex.cost}</div>{ex.currency === 'THB' && <div className="text-[10px] text-gray-400">≈ HKD {(ex.cost/4.3).toFixed(0)}</div>}</div></div>))}</div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 頁面 4: 工具 (ToolsView) ---
+        const ToolsView = ({ user }) => {
+            const [activeSection, setActiveSection] = useState('rate');
+            const subNavItems = [{id:'rate', label:'匯率'}, {id:'memo', label:'備忘'}, {id:'sos', label:'緊急'}];
+            const [amount, setAmount] = useState('');
+            const [currency, setCurrency] = useState('HKD');
+            const [result, setResult] = useState('');
+            const [personalNote, setPersonalNote] = useState("");
+            
+            useEffect(() => {
+                const savedNote = localStorage.getItem(`pattaya_note_${user.id}`);
+                if (savedNote) setPersonalNote(savedNote);
+            }, [user.id]);
+            const savePersonalNote = (e) => { const val = e.target.value; setPersonalNote(val); localStorage.setItem(`pattaya_note_${user.id}`, val); };
+            useEffect(() => { if (!amount) { setResult(''); return; } const rates = { 'HKD': 0.23, 'TWD': 0.90, 'USD': 0.029, 'CNY': 0.20 }; setResult((parseFloat(amount) * rates[currency]).toFixed(2)); }, [amount, currency]);
+            const scrollTo = (id) => { const el = document.getElementById(id); if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); setActiveSection(id); } };
+
+            return (
+                <div className="min-h-screen bg-bg animate-fade-in">
+                    <HeroHeader user={user} title="實用工具" subtitle="旅途小幫手" />
+                    <StickySubNav items={subNavItems} activeId={activeSection} onSelect={scrollTo} />
+                    <div className="p-4 pb-32 space-y-6">
+                        <div id="rate" className="bg-white p-6 rounded-[2rem] shadow-soft relative overflow-hidden border border-white"><div className="absolute top-0 right-0 w-24 h-24 bg-accent/10 rounded-bl-[4rem]"></div><h3 className="font-bold text-dark mb-4 flex items-center gap-2 relative z-10"><Icon name="coins" className="text-accent" size={18} /> 即時換算 (THB)</h3><div className="flex flex-col gap-3 relative z-10"><div className="flex items-center justify-between bg-bg p-3 rounded-2xl"><input type="number" value={amount} onChange={e => setAmount(e.target.value)} className="bg-transparent text-2xl font-bold w-32 outline-none placeholder-gray-300" placeholder="0" /><span className="text-xs font-bold text-gray-400">THB</span></div><div className="flex items-center justify-between bg-primary/10 p-3 rounded-2xl border border-primary/20"><span className="text-2xl font-bold text-primary">{result || '0.00'}</span><select value={currency} onChange={e => setCurrency(e.target.value)} className="bg-transparent text-xs font-bold text-primary outline-none text-right"><option value="HKD">HKD</option><option value="TWD">TWD</option></select></div></div></div>
+                        <div id="memo" className="bg-white p-6 rounded-[2rem] shadow-soft border border-white"><h3 className="font-bold text-dark mb-2 flex items-center gap-2"><Icon name="edit-3" className="text-accent" size={18} /> {user.name.split(' ')[0]} 的記事本</h3><textarea value={personalNote} onChange={savePersonalNote} className="w-full h-32 bg-bg p-4 rounded-xl text-sm outline-none resize-none" placeholder="記下想買的東西、代購清單..."></textarea></div>
+                        <div id="sos" className="grid grid-cols-2 gap-4"><a href="tel:1155" className="bg-red-50 p-4 rounded-2xl flex flex-col items-center justify-center text-red-500 border border-red-100 btn-press"><Icon name="phone" size={24} className="mb-1"/><span className="text-xs font-bold">旅遊警察 1155</span></a><a href="tel:191" className="bg-gray-50 p-4 rounded-2xl flex flex-col items-center justify-center text-gray-500 border border-gray-100 btn-press"><Icon name="ambulance" size={24} className="mb-1"/><span className="text-xs font-bold">緊急救護 191</span></a></div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- 頁面 5: 相簿 (MemoryView) ---
+        const MemoryView = ({ user }) => (
+            <div className="min-h-screen bg-bg animate-fade-in">
+                <HeroHeader user={user} title="回憶相簿" subtitle="九五至尊專屬" />
+                <div className="p-4 pb-32 flex flex-col items-center justify-center h-[50vh] text-center">
+                    <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6 text-primary animate-bounce"><Icon name="image" size={40} /></div>
+                    <button onClick={() => window.open('https://photos.google.com', '_blank')} className="bg-primary text-white px-8 py-3 rounded-xl font-bold btn-press shadow-lg shadow-primary/30 flex items-center gap-2"><Icon name="external-link" size={18} /> 前往共享相簿</button>
+                </div>
+            </div>
+        );
+
+        const App = () => {
+            const [user, setUser] = useState(null);
+            const [activeTab, setActiveTab] = useState('timeline');
+
+            useEffect(() => {
+                const savedUser = localStorage.getItem('pattaya_user');
+                if (savedUser) setUser(JSON.parse(savedUser));
+            }, []);
+
+            const handleLogin = (u) => {
+                setUser(u);
+                localStorage.setItem('pattaya_user', JSON.stringify(u));
+            };
+
+            if (!user) return <WelcomeView onLogin={handleLogin} />;
+
+            return (
+                <div className="min-h-screen bg-bg text-dark font-sans max-w-md mx-auto relative shadow-2xl overflow-hidden">
+                    {/* 左側主導航 */}
+                    <BookmarkNav activeTab={activeTab} setActiveTab={setActiveTab} />
+                    
+                    <main className="h-full overflow-y-auto no-scrollbar">
+                        {activeTab === 'timeline' && <TimelineView user={user} />}
+                        {activeTab === 'guide' && <GuideView user={user} />}
+                        {activeTab === 'wallet' && <WalletView user={user} />}
+                        {activeTab === 'tools' && <ToolsView user={user} />}
+                        {activeTab === 'memory' && <MemoryView user={user} />}
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
