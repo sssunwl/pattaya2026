@@ -15,6 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&family=Playfair+Display:wght@700&display=swap');
@@ -39,12 +40,11 @@
         /* --- 導航 --- */
         .sticky-nav-container {
             position: sticky;
-            top: 38px;
+            top: 48px; /* 修改：距離頂部 48px */
             z-index: 50;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 12px;
+            justify-content: space-between; /* 改為兩端對齊 */
+            align-items: flex-start;
             width: 100%;
             pointer-events: none; 
             margin-bottom: 20px;
@@ -54,8 +54,6 @@
 
         .menu-btn-wrapper {
             pointer-events: auto;
-            position: absolute;
-            left: 16px; 
             width: 48px;
             height: 48px;
             background: rgba(255, 255, 255, 0.7); 
@@ -69,27 +67,27 @@
             cursor: pointer;
             transition: transform 0.1s;
             z-index: 101;
+            flex-shrink: 0;
         }
         .menu-btn-wrapper:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.9); }
 
         .menu-dropdown {
-            position: fixed;
-            top: 95px;
-            left: 16px;
-            width: 110px;
+            position: absolute;
+            top: 54px; /* 緊貼按鈕下方 */
+            left: 0;
+            width: 56px; /* 縮小寬度，接近 Icon */
             background: rgba(255, 255, 255, 0.98);
             backdrop-filter: blur(20px);
-            border-radius: 16px;
-            padding: 6px;
+            border-radius: 24px;
+            padding: 8px 0;
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             display: flex;
             flex-direction: column;
-            gap: 4px;
-            transform-origin: top left;
+            align-items: center;
+            gap: 12px;
             border: 1px solid rgba(255,255,255,0.6);
             pointer-events: auto;
             z-index: 102;
-            animation: fadeIn 0.2s ease-out;
         }
 
         .day-tabs-wrapper {
@@ -97,23 +95,21 @@
             background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(12px);
             border-radius: 28px;
-            padding: 5px;
+            padding: 4px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             border: 1px solid rgba(255,255,255,0.5);
-            display: flex;
-            justify-content: flex-start;
-            gap: 4px;
-            overflow-x: auto;
-            max-width: calc(100% - 80px); 
+            display: grid;
+            grid-template-columns: repeat(6, 1fr); /* 6等分 */
+            gap: 2px;
+            width: calc(100% - 60px); /* 扣掉 Menu 空間 */
             height: 58px;
             align-items: center;
         }
 
         .day-pill {
-            flex-shrink: 0;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
+            width: 100%;
+            height: 46px;
+            border-radius: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -125,7 +121,7 @@
         .day-pill.active {
             background: #E09F7D;
             color: white;
-            box-shadow: 0 4px 12px rgba(224, 159, 125, 0.4);
+            box-shadow: 0 4px 10px rgba(224, 159, 125, 0.3);
             transform: scale(1.05);
         }
 
@@ -135,7 +131,7 @@
             transform-origin: center left;
         }
         .event-card:hover {
-            transform: scale(1.02) translateX(2px);
+            transform: scale(1.01) translateX(2px);
             box-shadow: 0 8px 20px -6px rgba(142, 154, 175, 0.3);
             background-color: #FFFFFF;
             z-index: 10;
@@ -169,15 +165,12 @@
         
         .timeline-circle {
             position: absolute;
-            left: -60px; /* 80px (pl-20) - 20px = center */
+            left: -60px; 
             top: 0;
             z-index: 10;
         }
 
         /* --- Modal & Animations --- */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -187,14 +180,13 @@
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            animation: fadeIn 0.2s ease-out;
         }
         
         .modal-content {
             background: #FFFFFF;
             width: 100%;
-            min-height: 85vh; 
-            max-height: 95vh;
+            height: auto;
+            max-height: 85vh; /* 降低高度 */
             border-top-left-radius: 2.5rem;
             border-top-right-radius: 2.5rem;
             overflow-y: auto;
@@ -202,74 +194,65 @@
             position: relative;
             z-index: 80;
             padding-bottom: 40px;
-            animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* 拖動手柄區域 */
+        .drag-handle {
+            width: 100%;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 50;
+            border-top-left-radius: 2.5rem;
+            border-top-right-radius: 2.5rem;
+        }
+        .drag-indicator {
+            width: 40px;
+            height: 5px;
+            background: #E5E7EB;
+            border-radius: 10px;
         }
 
         .square-map { width: 100%; padding-top: 100%; position: relative; border-radius: 1.5rem; overflow: hidden; border: 1px solid rgba(0,0,0,0.05); }
         .square-map iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
-        /* Guide 3欄圖片 Grid */
-        .grid-3-col {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-bottom: 16px;
-        }
-        .grid-3-col img {
-            width: 100%;
-            aspect-ratio: 1;
-            object-fit: cover;
-            border-radius: 12px;
-        }
+        .grid-3-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
+        .grid-3-col img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; }
         
-        /* Interactive 9-Grid (3x3 with Center Text) */
-        .ig-9-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 4px;
-            margin-bottom: 16px;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-        }
-        .ig-cell {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 1;
-            overflow: hidden;
-            background: #eee;
-            cursor: pointer;
-        }
-        .ig-cell img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.2s;
-        }
+        .ig-9-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 16px; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .ig-cell { position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; background: #eee; cursor: pointer; }
+        .ig-cell img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s; }
         .ig-cell img:active { opacity: 0.8; }
-        
-        .ig-center-text {
-            grid-column: 2;
-            grid-row: 2;
-            background: rgba(255,255,255,0.95);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 6px;
-            text-align: center;
-            font-size: 11px;
-            font-weight: bold;
-            color: #4A4A4A;
-            line-height: 1.4;
-            z-index: 10;
-            border: 1px solid #E09F7D;
-        }
+        .ig-center-text { grid-column: 2; grid-row: 2; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; padding: 6px; text-align: center; font-size: 11px; font-weight: bold; color: #4A4A4A; line-height: 1.4; z-index: 10; border: 1px solid #E09F7D; }
         
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 1rem; margin-bottom: 1rem; background: #000; }
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
         .btn-press { transition: transform 0.1s; cursor: pointer; }
         .btn-press:active { transform: scale(0.95); }
+        
+        /* Guide 導航按鈕樣式 */
+        .pill-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            color: #8E9AAF;
+            background: #FFFFFF;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .pill-btn.active {
+            background: #E09F7D;
+            color: white;
+            box-shadow: 0 4px 12px rgba(224, 159, 125, 0.4);
+            transform: scale(1.05);
+        }
     </style>
     
     <script>
@@ -296,6 +279,7 @@
 
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
+        const { motion, AnimatePresence } = window.Motion;
 
         // --- 資料庫 ---
         const MEMBERS = [
@@ -319,17 +303,16 @@
             { date: "2/18", icon: "plane", temp: "28°", label: "Day 6" },
         ];
 
-        // MOCK GALLERY (9張)
         const MOCK_GALLERY = [
-            { url: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=300", desc: "豪華包船外觀，雙層設計超氣派，拍照效果極佳。" },
-            { url: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=300", desc: "海上溜滑梯，直接衝進蔚藍大海，刺激又消暑！" },
-            { url: "https://images.unsplash.com/photo-1544551763-46a8723ba3f9?w=300", desc: "透明獨木舟，像漂浮在空中一樣，適合網美擺拍。" },
-            { url: "https://images.unsplash.com/photo-1516916759473-600c07bc99d7?w=300", desc: "海釣體驗，船員會協助指導，運氣好晚餐加菜！" },
+            { url: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=300", desc: "豪華包船外觀，雙層設計超氣派。" },
+            { url: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=300", desc: "海上溜滑梯，直接衝進蔚藍大海！" },
+            { url: "https://images.unsplash.com/photo-1544551763-46a8723ba3f9?w=300", desc: "透明獨木舟，像漂浮在空中一樣。" },
+            { url: "https://images.unsplash.com/photo-1516916759473-600c07bc99d7?w=300", desc: "海釣體驗，運氣好晚餐加菜！" },
             { url: "TEXT_CENTER", desc: "" }, 
-            { url: "https://images.unsplash.com/photo-1534008753122-a837cf46d288?w=300", desc: "清澈海水，浮潛看熱帶魚，水質乾淨能見度高。" },
-            { url: "https://images.unsplash.com/photo-1540206395-688085723adb?w=300", desc: "船上 BBQ，現烤大蝦味道鮮美，配上特製沾醬。" },
-            { url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300", desc: "夕陽西下，回程海風超舒服，是放鬆的最佳時刻。" },
-            { url: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=300", desc: "私人派對，全家人的專屬回憶，無人打擾的時光。" }
+            { url: "https://images.unsplash.com/photo-1534008753122-a837cf46d288?w=300", desc: "清澈海水，浮潛看熱帶魚。" },
+            { url: "https://images.unsplash.com/photo-1540206395-688085723adb?w=300", desc: "船上 BBQ，現烤大蝦味道鮮美。" },
+            { url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=300", desc: "夕陽西下，回程海風超舒服。" },
+            { url: "https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=300", desc: "私人派對，全家人的專屬回憶。" }
         ];
 
         const ITINERARY = [
@@ -343,7 +326,6 @@
                     { id: "e5", time: "21:30", title: "Makkah Spa", desc: "舒緩飛行疲勞按摩。第一天舟車勞頓，最需要的就是一場高品質按摩。Makkah Spa 環境清幽典雅，手法專業，能徹底舒緩飛行疲勞，讓大家帶著放鬆的身心入睡，迎接明天的行程。", location: "Makkah Health & Spa Pattaya", thai_text: "มัคคา เฮลท์ แอนด์ สปา", icon: "sparkles", type: "spa", img: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800", gallery: MOCK_GALLERY, galleryDesc: "SPA 環境靜謐，服務人員親切。" }
                 ]
             },
-            // Day 2-6 (完整資料保留)
             {
                 day: "Day 2", date: "2/14", weekday: "(六)", theme: "「泰」科幻", id: "d2", highlights: "星際探險之旅",
                 details: [
@@ -392,7 +374,7 @@
             }
         ];
 
-        // 攻略資料 (14項完整 + 長介紹)
+        // 攻略資料 (擴充內容與照片 + 必點美食 + 影片 + 多欄)
         const GUIDE_ITEMS = [
             { 
                 id: 1, category: "玩樂", name: "Sealyn 包船", tag: "豪華長尾船", 
@@ -730,7 +712,7 @@
                         </div>
                     </div>
 
-                    {/* 記帳區塊 */}
+                    {/* 記帳區塊 - 3x3選人 + 雙幣顯示 */}
                     <div id="wallet" className="px-4 pb-12 pt-8">
                         <h2 className="font-serif text-2xl text-dark mb-4 px-2 flex items-center gap-2"><Icon name="wallet" className="text-accent"/> 公數記帳</h2>
                         <div className="space-y-6">
