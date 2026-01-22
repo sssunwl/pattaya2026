@@ -49,15 +49,15 @@
 
         /* Navigation */
         .sticky-nav-container { position: sticky; top: 54px; z-index: 50; display: flex; align-items: flex-start; gap: 12px; width: 100%; pointer-events: none; margin-bottom: 20px; margin-top: 10px; padding: 0 16px; }
-        .menu-btn-wrapper { pointer-events: auto; width: 48px; height: 48px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.6); cursor: pointer; transition: transform 0.1s; z-index: 101; flex-shrink: 0; }
+        .menu-btn-wrapper { pointer-events: auto; position: relative; width: 48px; height: 48px; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px); border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.6); cursor: pointer; transition: transform 0.1s; z-index: 101; flex-shrink: 0; }
         .menu-btn-wrapper:active { transform: scale(0.95); }
         
-        /* Fixed Menu Dropdown - 固定定位，防止被遮擋 */
+        /* Fixed Menu Dropdown - 強制固定定位，修復看不見的問題 */
         .menu-dropdown { 
             position: fixed; 
-            top: 110px; 
+            top: 110px; /* 54(nav top) + 48(btn height) + 8(gap) */
             left: 16px; 
-            width: 60px; 
+            width: 64px; 
             background: rgba(255, 255, 255, 0.98); 
             backdrop-filter: blur(20px); 
             border-radius: 16px; 
@@ -66,19 +66,21 @@
             display: flex; flex-direction: column; align-items: center; gap: 12px; 
             border: 1px solid rgba(255,255,255,0.6); 
             pointer-events: auto; 
-            z-index: 1000; 
+            z-index: 2000; /* 確保在最上層 */
             animation: fadeIn 0.2s ease-out; 
         }
         .menu-item { display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; padding: 6px 0; border-radius: 8px; font-size: 10px; font-weight: bold; color: #4A4A4A; transition: background 0.2s; cursor: pointer; }
         .menu-item:active { background: #F3F4F6; }
         
-        /* User Selection Popout - 橫向 */
+        /* User Selection Popout */
         .user-popout {
-            position: fixed; top: 110px; left: 84px; 
+            position: absolute; 
+            top: 0; 
+            left: 72px; /* 選單寬度 + gap */
             background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(20px);
             border-radius: 16px; padding: 8px; border: 1px solid rgba(255,255,255,0.6);
             display: flex; gap: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-            animation: fadeIn 0.2s ease-out; width: max-content; z-index: 1001;
+            animation: fadeIn 0.2s ease-out; width: max-content; z-index: 2001;
             max-width: 70vw; overflow-x: auto;
         }
 
@@ -90,10 +92,18 @@
         .timeline-line { position: absolute; left: 40px; top: 0; bottom: 0; width: 2px; background-image: linear-gradient(to bottom, #E09F7D 50%, transparent 50%); background-size: 2px 10px; background-repeat: repeat-y; z-index: 0; opacity: 0.4; }
         .timeline-circle { position: absolute; left: -56px; top: 0; z-index: 10; width: 40px; height: 40px; border-radius: 50%; background-color: #E09F7D; color: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; line-height: 1; border: 2px solid white; cursor: pointer; }
         
-        .itinerary-header { background: white; padding: 12px 16px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02); cursor: pointer; transition: all 0.2s; margin-left: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-        .itinerary-header:active { transform: scale(0.98); background: #F9FAFB; }
+        .itinerary-header { 
+            background: #FFF9F5; /* 暖橙色背景 */
+            padding: 12px 16px; border-radius: 16px; 
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03); border: 1px solid rgba(224, 159, 125, 0.2); 
+            cursor: pointer; transition: all 0.2s; margin-left: 12px; margin-bottom: 8px; 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .itinerary-header:active { transform: scale(0.98); background: #FFEFE5; }
+
         .event-card { transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1); transform-origin: center left; cursor: pointer; background: white; border-radius: 1rem; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.02); }
         .event-card:hover { transform: scale(1.02); background-color: #FFFFFF; box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
+        .event-card:active { transform: scale(0.98); background-color: #F9FAFB; }
 
         /* Modal */
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 70; display: flex; flex-direction: column; justify-content: flex-end; animation: fadeIn 0.2s ease-out; }
@@ -105,6 +115,7 @@
         /* UI Utils */
         .pill-btn { padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: bold; color: #8E9AAF; background: #FFFFFF; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.05); white-space: nowrap; transition: all 0.2s; cursor: pointer; }
         .pill-btn.active { background: #E09F7D !important; color: #FFFFFF !important; box-shadow: 0 4px 10px rgba(224, 159, 125, 0.4); border-color: transparent; }
+        .pill-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.08); }
         
         .cat-tag { position: absolute; top: 0; left: 0; width: 24px; height: 24px; border-bottom-right-radius: 12px; color: white; display: flex; align-items: center; justify-content: center; font-size: 10px; z-index: 5; }
         .cat-bg-transport { background-color: #60A5FA; } .cat-bg-food { background-color: #F97316; } .cat-bg-shopping { background-color: #EC4899; } .cat-bg-misc { background-color: #9CA3AF; }
@@ -113,31 +124,32 @@
         .square-map iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
         .grid-3-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 16px; }
         .grid-3-col img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; }
-        
-        /* 6-Grid Style */
         .ig-6-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-bottom: 16px; border-radius: 16px; overflow: hidden; }
         .ig-cell { position: relative; width: 100%; aspect-ratio: 1; background: #eee; cursor: pointer; }
         .ig-cell img { width: 100%; height: 100%; object-fit: cover; transition: opacity 0.2s; }
+        .ig-cell img:active { opacity: 0.8; }
         .ig-center-text { grid-column: 2; grid-row: 2; background: rgba(255,255,255,0.95); display: flex; align-items: center; justify-content: center; padding: 4px; text-align: center; font-size: 10px; color: #4A4A4A; z-index: 10; border: 1px solid #E09F7D; overflow-y: auto; }
-        
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 1rem; margin-bottom: 1rem; background: #000; }
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
-        /* Wallet Buttons Fix */
+        /* Wallet Buttons Enhanced */
+        .btn-confirm { background-color: #1F2937; color: #FFFFFF !important; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: none; }
+        .btn-confirm:active { background-color: #000000; transform: scale(0.98); }
         .btn-primary { background-color: #4A4A4A; color: white; border-radius: 12px; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         .btn-primary:active { background-color: #333; transform: scale(0.98); }
         .btn-secondary { background-color: white; color: #4A4A4A; border: 1px solid #E5E7EB; border-radius: 12px; font-weight: bold; }
         .btn-secondary:active { background-color: #F3F4F6; transform: scale(0.98); }
+        
         .filter-btn { padding: 4px 12px; border-radius: 99px; font-size: 12px; font-weight: bold; border: 1px solid #E5E7EB; color: #6B7280; background: white; white-space: nowrap; transition: all 0.2s; cursor: pointer; }
         .filter-btn.active { background-color: #4A4A4A !important; color: white !important; border-color: transparent !important; }
 
         /* Person Selector Scroll */
-        .person-selector { display: flex; gap: 12px; overflow-x: auto; padding: 8px 0; }
-        .person-item { min-width: 50px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.2s; }
-        .person-avatar { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; background: #F3F4F6; border: 2px solid transparent; transition: all 0.2s; }
+        .person-selector { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; }
+        .person-item { min-width: 50px; display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: all 0.2s; padding: 4px; border-radius: 12px; }
+        .person-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; background: #F3F4F6; border: 2px solid transparent; transition: all 0.2s; }
         .person-item.selected .person-avatar { border-color: #E09F7D; background: #FFF; box-shadow: 0 4px 10px rgba(224, 159, 125, 0.3); transform: scale(1.1); }
         .person-item.unselected .person-avatar { opacity: 0.5; }
-        .person-name { font-size: 10px; font-weight: bold; margin-top: 4px; color: #666; }
+        .person-name { font-size: 10px; font-weight: bold; margin-top: 4px; color: #666; text-align: center; width: 100%; overflow: hidden; text-overflow: ellipsis; }
         .person-item.selected .person-name { color: #E09F7D; }
 
         #error-message { display: none; padding: 20px; color: red; text-align: center; background: white; height: 100vh; flex-direction: column; justify-content: center; z-index: 9999; position: fixed; top: 0; left: 0; width: 100%; }
@@ -169,7 +181,7 @@
             { id: 'yi', name: "Yi", avatar: "🐼" }, { id: 'justin', name: "Justin", avatar: "🐵" }, { id: 'han', name: "Han", avatar: "👶" }
         ];
 
-        const WEATHER_DATA = [ { date: "2/13", icon: "cloud-sun", temp: "31°" }, { date: "2/14", icon: "sun", temp: "32°" }, { date: "2/15", icon: "sun", temp: "29°" }, { date: "2/16", icon: "sun", temp: "30°" }, { date: "2/17", icon: "cloud-sun", temp: "31°" }, { date: "2/18", icon: "plane", temp: "28°" } ];
+        const WEATHER_DATA = [ { date: "2/13", icon: "cloud-sun", temp: "31°", label: "Day 1" }, { date: "2/14", icon: "sun", temp: "32°", label: "Day 2" }, { date: "2/15", icon: "sun", temp: "29°", label: "Day 3" }, { date: "2/16", icon: "sun", temp: "30°", label: "Day 4" }, { date: "2/17", icon: "cloud-sun", temp: "31°", label: "Day 5" }, { date: "2/18", icon: "plane", temp: "28°", label: "Day 6" } ];
         
         const MOCK_GALLERY = [
             "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?w=300", "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=300", "https://images.unsplash.com/photo-1544551763-46a8723ba3f9?w=300",
@@ -347,6 +359,9 @@
             const [isBalancesExpanded, setIsBalancesExpanded] = useState(false);
 
             // 匯率計算：THB 為基準 (Rate = 1/ExchangeRate)
+            // 公式: Amount * (TargetRate / SourceRate). Base THB.
+            // Target is THB (1). Source is Currency Rate.
+            // So: Amount * (1 / Rate)
             const toBaseAmount = (amt, curr) => {
                 if (!exchangeRates) return amt;
                 return amt * (1 / exchangeRates[curr]);
@@ -405,17 +420,17 @@
                         <div>
                              <div className="text-[10px] text-gray-500 mb-1 font-bold">總開支</div>
                              <div className="text-3xl font-serif font-bold text-dark">฿{(publicTotal).toFixed(0)}</div>
-                             <div className="text-[8px] text-gray-400">≈HKD{toHKD(publicTotal)}</div>
+                             <div className="text-sm font-bold text-gray-400">≈ HKD {toHKD(publicTotal)}</div>
                         </div>
                         <div className="border-l border-r border-gray-100 px-4">
                              <div className="text-[10px] text-gray-500 mb-1 font-bold">每人應付</div>
                              <div className="text-xl font-bold text-accent">฿{(publicTotal / 8).toFixed(0)}</div>
-                             <div className="text-[8px] text-gray-400">≈HKD{toHKD(publicTotal/8)}</div>
+                             <div className="text-sm font-bold text-gray-400">≈ HKD {toHKD(publicTotal/8)}</div>
                         </div>
                         <div className="bg-primary/10 rounded-xl p-2">
                              <div className="text-[10px] text-primary mb-1 font-bold">個人開支</div>
                              <div className="text-lg font-bold text-primary">฿{privateTotal.toFixed(0)}</div>
-                             <div className="text-[8px] text-primary/70">≈HKD{toHKD(privateTotal)}</div>
+                             <div className="text-sm font-bold text-primary/70">≈ HKD {toHKD(privateTotal)}</div>
                         </div>
                     </div>
 
@@ -437,14 +452,14 @@
                     <div className="bg-white p-5 rounded-3xl shadow-soft space-y-4 border border-white transition-all">
                         {!expenseMode ? (
                             <div className="flex gap-2">
-                                <button onClick={() => setExpenseMode('public')} className="btn-primary flex-1 py-3 flex items-center justify-center gap-2"><Icon name="plus" size={18}/> 記公帳</button>
+                                <button onClick={() => setExpenseMode('public')} className="btn-confirm flex-1 py-3 flex items-center justify-center gap-2"><Icon name="plus" size={18}/> 記公帳</button>
                                 <button onClick={() => setExpenseMode('private')} className="btn-secondary flex-1 py-3 flex items-center justify-center gap-2"><Icon name="user-plus" size={18}/> 記私帳</button>
                             </div>
                         ) : (
                             <>
                                 <div className="flex justify-between items-center"><span className="text-xs font-bold text-gray-400">{expenseMode==='public'?'新增公帳':'新增私帳'}</span><button onClick={()=>setExpenseMode(null)}><Icon name="chevron-up" size={20}/></button></div>
                                 <div className="flex gap-2 items-center">
-                                    <input type="number" placeholder="金額" value={cost} onChange={e=>setCost(e.target.value)} className="flex-1 bg-bg p-3 rounded-xl text-xl font-bold outline-none"/>
+                                    <input type="number" placeholder="金額" value={cost} onChange={e=>setCost(e.target.value)} className="bg-bg p-3 rounded-xl text-xl font-bold outline-none w-28 text-center"/>
                                     <select value={currency} onChange={e=>setCurrency(e.target.value)} className="bg-bg p-3 rounded-xl text-sm font-bold"><option value="THB">THB</option><option value="HKD">HKD</option></select>
                                     <div className="text-right text-xs font-bold px-1 min-w-[60px]"><div className={currency==='THB'?'text-dark text-lg':'text-gray-400 text-sm'}>฿{currency==='THB'?cost:(cost*4.3).toFixed(1)}</div><div className={currency==='HKD'?'text-dark text-base':'text-gray-400 text-xs'}>HKD ${currency==='HKD'?cost:(cost/4.3).toFixed(1)}</div></div>
                                 </div>
@@ -455,7 +470,7 @@
                                         <div><div className="flex justify-between mb-1"><label className="text-xs text-gray-400 font-bold">誰分攤</label><button onClick={toggleAll} className="text-[10px] text-accent">全選/清空</button></div><div className="person-selector">{MEMBERS.map(m=><div key={m.id} onClick={()=>toggleSplitter(m.id)} className={`person-item ${splitters.includes(m.id)?'selected':'unselected'}`}><div className="person-avatar">{m.avatar}</div><span className="person-name">{m.name}</span></div>)}</div></div>
                                     </>
                                 )}
-                                <div className="flex gap-2"><button onClick={()=>setExpenseMode(null)} className="flex-1 bg-gray-100 py-3 rounded-xl font-bold text-gray-500">取消</button><button onClick={addExpense} className="flex-[2] bg-dark text-white py-3 rounded-xl font-bold shadow-lg">加入帳本</button></div>
+                                <div className="flex gap-2"><button onClick={()=>setExpenseMode(null)} className="flex-1 bg-gray-100 py-3 rounded-xl font-bold text-gray-500">取消</button><button onClick={addExpense} className="flex-[2] btn-confirm py-3 shadow-lg">加入帳本</button></div>
                             </>
                         )}
                     </div>
@@ -631,6 +646,7 @@
             const handleSwitchUser = (newUser) => {
                 setUser(newUser);
                 localStorage.setItem('pattaya_user', JSON.stringify(newUser));
+                setMenuOpen(false);
             };
 
             return (
@@ -718,15 +734,18 @@
 
         const App = () => {
             const [user, setUser] = useState(null);
+
             useEffect(() => {
                 const loader = document.getElementById('loading');
                 if(loader) loader.style.display = 'none';
                 
+                // 預設自動登入第一位用戶 (Lam)
                 const defaultUser = MEMBERS[0];
                 setUser(defaultUser);
                 localStorage.setItem('pattaya_user', JSON.stringify(defaultUser));
             }, []);
             
+            // 重要：移除 WelcomeView，直接渲染 MainApp
             if (!user) return null; 
             return <MainApp user={user} setUser={setUser} />;
         };
